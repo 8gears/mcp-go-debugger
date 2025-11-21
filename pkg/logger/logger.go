@@ -1,7 +1,8 @@
 // Package logger provides a logging utility based on log/slog
 //
 // DEBUG logging can be enabled by setting the MCP_DEBUG environment variable:
-//   export MCP_DEBUG=1
+//
+//	export MCP_DEBUG=1
 //
 // By default, debug logging is disabled to reduce noise in normal operation.
 package logger
@@ -22,7 +23,7 @@ func init() {
 	// Set up the logger based on environment variable
 	debugEnabled := false
 	debugEnv := os.Getenv("MCP_DEBUG")
-	
+
 	if debugEnv != "" && strings.ToLower(debugEnv) != "false" && debugEnv != "0" {
 		debugEnabled = true
 	}
@@ -37,7 +38,7 @@ func init() {
 	opts := &slog.HandlerOptions{
 		Level: logLevel,
 	}
-	
+
 	// You could customize the output format here if needed
 	handler := slog.NewTextHandler(os.Stderr, opts)
 	Logger = slog.New(handler)
@@ -86,7 +87,7 @@ func Printf(format string, args ...any) {
 func Println(args ...any) {
 	message := fmt.Sprintln(args...)
 	message = strings.TrimSuffix(message, "\n") // Remove trailing newline
-	
+
 	if strings.HasPrefix(message, "DEBUG:") {
 		Debug(strings.TrimPrefix(message, "DEBUG:"))
 	} else if strings.HasPrefix(message, "Warning:") {
@@ -96,4 +97,4 @@ func Println(args ...any) {
 	} else {
 		Info(message)
 	}
-} 
+}

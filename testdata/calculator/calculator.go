@@ -23,4 +23,4 @@ func Divide(a, b int) int {
 		return 0 // Avoid division by zero
 	}
 	return a / b
-} 
+}

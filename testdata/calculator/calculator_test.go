@@ -11,7 +11,7 @@ func TestAdd(t *testing.T) {
 	if result != 5 {
 		t.Errorf("Add(2, 3) = %d; want 5", result)
 	}
-	
+
 	// Additional tests
 	cases := []struct {
 		a, b, want int
@@ -20,7 +20,7 @@ func TestAdd(t *testing.T) {
 		{-1, 1, 0},
 		{10, 5, 15},
 	}
-	
+
 	for _, tc := range cases {
 		got := Add(tc.a, tc.b)
 		if got != tc.want {
@@ -35,7 +35,7 @@ func TestSubtract(t *testing.T) {
 	if result != 2 {
 		t.Errorf("Subtract(5, 3) = %d; want 2", result)
 	}
-	
+
 	// This assertion will fail deliberately
 	// Useful for testing debug capabilities
 	if Subtract(5, 5) != 1 { // Deliberately wrong (should be 0)
@@ -54,7 +54,7 @@ func TestMultiply(t *testing.T) {
 		{2, 3, 6},
 		{-2, 3, -6},
 	}
-	
+
 	for _, tc := range cases {
 		got := Multiply(tc.a, tc.b)
 		if got != tc.want {
@@ -70,13 +70,13 @@ func TestDivide(t *testing.T) {
 	if result != 5 {
 		t.Errorf("Divide(10, 2) = %d; want 5", result)
 	}
-	
+
 	// Test division by zero
 	result = Divide(10, 0)
 	if result != 0 {
 		t.Errorf("Divide(10, 0) = %d; want 0", result)
 	}
-	
+
 	// Logs for debugging
 	t.Logf("Division by zero handled correctly, returned %d", result)
-} 
+}
