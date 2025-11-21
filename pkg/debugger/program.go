@@ -46,7 +46,7 @@ func (c *Client) LaunchProgram(program string, args []string) types.LaunchRespon
 	}
 
 	// Configure Delve logging
-	logflags.Setup(false, "", "")
+	_ = logflags.Setup(false, "", "")
 
 	// Create a listener for the debug server
 	listener, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", port))
@@ -62,7 +62,7 @@ func (c *Client) LaunchProgram(program string, args []string) types.LaunchRespon
 
 	stderrReader, stderrRedirect, err := proc.Redirector()
 	if err != nil {
-		stdoutRedirect.File.Close()
+		_ = stdoutRedirect.File.Close()
 		return c.createLaunchResponse(nil, program, args, fmt.Errorf("failed to create stderr redirector: %v", err))
 	}
 
@@ -125,7 +125,6 @@ func (c *Client) LaunchProgram(program string, args []string) types.LaunchRespon
 			if err == nil && state != nil {
 				c.client = client
 				c.target = absPath
-				connected = true
 
 				return c.createLaunchResponse(state, program, args, nil)
 			}
@@ -152,7 +151,7 @@ func (c *Client) AttachToProcess(pid int) types.AttachResponse {
 
 	logger.Debug("Setting up Delve logging")
 	// Configure Delve logging
-	logflags.Setup(false, "", "")
+	_ = logflags.Setup(false, "", "")
 
 	logger.Debug("Creating listener on port %d", port)
 	// Create a listener for the debug server
@@ -232,7 +231,6 @@ func (c *Client) AttachToProcess(pid int) types.AttachResponse {
 				// Connection successful
 				c.client = client
 				c.pid = pid
-				connected = true
 				logger.Debug("Successfully attached to process with PID: %d", pid)
 
 				// Get initial state

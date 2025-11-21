@@ -15,9 +15,11 @@ func main() {
 	// Configure additional file logging if needed
 	logFile, err := os.OpenFile("mcp-go-debugger.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err == nil {
-		defer logFile.Close()
-		// We're using the logger package which already sets up logging
-		// This file is just for additional logging if needed
+		defer func() {
+			if err := logFile.Close(); err != nil {
+				logger.Warn("Failed to close log file", "error", err)
+			}
+		}()
 	} else {
 		logger.Warn("Failed to set up log file", "error", err)
 	}
@@ -33,4 +35,4 @@ func main() {
 		logger.Error("Server error", "error", err)
 		os.Exit(1)
 	}
-} 
+}

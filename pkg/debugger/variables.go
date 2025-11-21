@@ -55,8 +55,8 @@ func (c *Client) EvalVariable(name string, depth int) types.EvalVariableResponse
 	}
 
 	// Format the value based on the variable kind
-	if v.Kind == reflect.Struct {
-		// For struct types, format fields
+	switch v.Kind {
+	case reflect.Struct:
 		if len(v.Children) > 0 {
 			fields := make([]string, 0, len(v.Children))
 			for _, field := range v.Children {
@@ -65,10 +65,9 @@ func (c *Client) EvalVariable(name string, depth int) types.EvalVariableResponse
 			}
 			variable.Value = "{" + strings.Join(fields, ", ") + "}"
 		} else {
-			variable.Value = "{}" // Empty struct
+			variable.Value = "{}"
 		}
-	} else if v.Kind == reflect.Array || v.Kind == reflect.Slice {
-		// For array or slice types, format elements
+	case reflect.Array, reflect.Slice:
 		if len(v.Children) > 0 {
 			elements := make([]string, 0, len(v.Children))
 			for _, element := range v.Children {
@@ -76,9 +75,9 @@ func (c *Client) EvalVariable(name string, depth int) types.EvalVariableResponse
 			}
 			variable.Value = "[" + strings.Join(elements, ", ") + "]"
 		} else {
-			variable.Value = "[]" // Empty array or slice
+			variable.Value = "[]"
 		}
-	} else {
+	default:
 		variable.Value = v.Value
 	}
 
@@ -120,35 +119,6 @@ func getVariableKind(v *api.Variable) string {
 	}
 }
 
-// Helper function to get struct field information
-func getStructFields(v api.Variable) string {
-	if len(v.Children) == 0 {
-		return "none"
-	}
-
-	fields := make([]string, len(v.Children))
-	for i, field := range v.Children {
-		fields[i] = fmt.Sprintf("%s %s", field.Name, field.Type)
-	}
-	return strings.Join(fields, ", ")
-}
-
-// Helper function to get map key type
-func getMapKeyType(v api.Variable) string {
-	if len(v.Children) == 0 {
-		return "unknown"
-	}
-	return v.Children[0].Type
-}
-
-// Helper function to get map value type
-func getMapValueType(v api.Variable) string {
-	if len(v.Children) < 2 {
-		return "unknown"
-	}
-	return v.Children[1].Type
-}
-
 // getLocalVariables extracts local variables and arguments from the current scope
 func (c *Client) getLocalVariables(state *api.DebuggerState) ([]types.Variable, error) {
 	if state == nil || state.SelectedGoroutine == nil {
@@ -175,8 +145,8 @@ func (c *Client) getLocalVariables(state *api.DebuggerState) ([]types.Variable, 
 		var value string
 
 		// Format the value based on the variable kind
-		if v.Kind == reflect.Struct {
-			// For struct types, format fields
+		switch v.Kind {
+		case reflect.Struct:
 			if len(v.Children) > 0 {
 				fields := make([]string, 0, len(v.Children))
 				for _, field := range v.Children {
@@ -185,10 +155,9 @@ func (c *Client) getLocalVariables(state *api.DebuggerState) ([]types.Variable, 
 				}
 				value = "{" + strings.Join(fields, ", ") + "}"
 			} else {
-				value = "{}" // Empty struct
+				value = "{}"
 			}
-		} else if v.Kind == reflect.Array || v.Kind == reflect.Slice {
-			// For array or slice types, format elements
+		case reflect.Array, reflect.Slice:
 			if len(v.Children) > 0 {
 				elements := make([]string, 0, len(v.Children))
 				for _, element := range v.Children {
@@ -196,9 +165,9 @@ func (c *Client) getLocalVariables(state *api.DebuggerState) ([]types.Variable, 
 				}
 				value = "[" + strings.Join(elements, ",") + "]"
 			} else {
-				value = "[]" // Empty array or slice
+				value = "[]"
 			}
-		} else {
+		default:
 			value = v.Value
 		}
 

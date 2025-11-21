@@ -45,11 +45,10 @@ func (c *Client) Step() types.StepResponse {
 
 	if delveState.Running {
 		logger.Debug("Warning: Cannot step when program is running, waiting for program to stop")
-		stoppedState, err := waitForStop(c, 2*time.Second)
+		_, err := waitForStop(c, 2*time.Second)
 		if err != nil {
 			return c.createStepResponse(nil, "into", fromLocation, fmt.Errorf("failed to wait for program to stop: %v", err))
 		}
-		delveState = stoppedState
 	}
 
 	logger.Debug("Stepping into")
@@ -77,11 +76,10 @@ func (c *Client) StepOver() types.StepResponse {
 
 	if delveState.Running {
 		logger.Debug("Warning: Cannot step when program is running, waiting for program to stop")
-		stoppedState, err := waitForStop(c, 2*time.Second)
+		_, err := waitForStop(c, 2*time.Second)
 		if err != nil {
 			return c.createStepResponse(nil, "over", fromLocation, fmt.Errorf("failed to wait for program to stop: %v", err))
 		}
-		delveState = stoppedState
 	}
 
 	logger.Debug("Stepping over next line")
@@ -109,11 +107,10 @@ func (c *Client) StepOut() types.StepResponse {
 
 	if delveState.Running {
 		logger.Debug("Warning: Cannot step out when program is running, waiting for program to stop")
-		stoppedState, err := waitForStop(c, 2*time.Second)
+		_, err := waitForStop(c, 2*time.Second)
 		if err != nil {
 			return c.createStepResponse(nil, "out", fromLocation, fmt.Errorf("failed to wait for program to stop: %v", err))
 		}
-		delveState = stoppedState
 	}
 
 	logger.Debug("Stepping out")

@@ -22,7 +22,6 @@ type Client struct {
 	target      string
 	pid         int
 	server      *rpccommon.ServerImpl
-	tempDir     string
 	stdout      bytes.Buffer       // Buffer for captured stdout
 	stderr      bytes.Buffer       // Buffer for captured stderr
 	outputChan  chan OutputMessage // Channel for captured output
@@ -59,22 +58,10 @@ func getFreePort() (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	defer l.Close()
+	defer func() {
+		_ = l.Close()
+	}()
 	return l.Addr().(*net.TCPAddr).Port, nil
-}
-
-// Helper function to wait for server to be available
-func waitForServer(addr string) error {
-	timeout := time.Now().Add(5 * time.Second)
-	for time.Now().Before(timeout) {
-		conn, err := net.DialTimeout("tcp", addr, 100*time.Millisecond)
-		if err == nil {
-			conn.Close()
-			return nil
-		}
-		time.Sleep(100 * time.Millisecond)
-	}
-	return fmt.Errorf("timeout waiting for server")
 }
 
 // waitForStop polls the debugger until it reaches a stopped state or times out
@@ -100,16 +87,19 @@ func waitForStop(c *Client, timeout time.Duration) (*api.DebuggerState, error) {
 
 // captureOutput reads from a reader and sends the output to the output channel and buffer
 func (c *Client) captureOutput(reader io.ReadCloser, source string) {
-	defer reader.Close()
+	defer func() {
+		_ = reader.Close()
+	}()
 
 	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
 		line := scanner.Text()
 
 		// Write to appropriate buffer
-		if source == "stdout" {
+		switch source {
+		case "stdout":
 			c.stdout.WriteString(line + "\n")
-		} else if source == "stderr" {
+		case "stderr":
 			c.stderr.WriteString(line + "\n")
 		}
 

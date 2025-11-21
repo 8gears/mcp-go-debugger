@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -86,10 +85,12 @@ func TestDebugWorkflow(t *testing.T) {
 
 	// Create a test Go file with multiple functions and variables for debugging
 	testFile := createComplexTestGoFile(t)
-	defer os.RemoveAll(filepath.Dir(testFile))
+	defer func() {
+		_ = os.RemoveAll(filepath.Dir(testFile))
+	}()
 
 	// Read and print the file content for debugging
-	fileContent, err := ioutil.ReadFile(testFile)
+	fileContent, err := os.ReadFile(testFile)
 	if err != nil {
 		t.Fatalf("Failed to read test file: %v", err)
 	}
@@ -290,7 +291,7 @@ func TestDebugWorkflow(t *testing.T) {
 
 // Helper function to create a more complex Go file for debugging tests
 func createComplexTestGoFile(t *testing.T) string {
-	tempDir, err := ioutil.TempDir("", "go-debugger-complex-test")
+	tempDir, err := os.MkdirTemp("", "go-debugger-complex-test")
 	if err != nil {
 		t.Fatalf("Failed to create temp directory: %v", err)
 	}
@@ -369,7 +370,7 @@ func processFurther(value int) int {
 	return result
 }
 `
-	if err := ioutil.WriteFile(goFile, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(goFile, []byte(content), 0644); err != nil {
 		t.Fatalf("Failed to write complex test Go file: %v", err)
 	}
 
