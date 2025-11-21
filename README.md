@@ -84,7 +84,7 @@ This debugger is designed to be integrated with MCP-compatible clients. The tool
 - `attach` - Attach to a running Go process
 - `debug` - Debug a Go source file directly
 - `debug_test` - Debug a specific Go test function
-- `set_breakpoint` - Set a breakpoint at a specific file and line
+- `set_breakpoint` - Set a breakpoint at a specific file and line with optional condition
 - `list_breakpoints` - List all current breakpoints
 - `remove_breakpoint` - Remove a breakpoint
 - `continue` - Continue execution until next breakpoint or program end
@@ -123,7 +123,7 @@ If your Go application is already running, you can attach the debugger:
 ### Finding a Bug Example
 
 ```
-> I'm getting a panic in my processOrders function when handling large orders. 
+> I'm getting a panic in my processOrders function when handling large orders.
 > Can you help me debug it?
 ```
 
@@ -131,6 +131,20 @@ The AI will help you:
 1. Set breakpoints in the relevant function
 2. Eval variables as execution proceeds
 3. Identify the root cause of the issue
+
+#### Using Conditional Breakpoints
+
+For more targeted debugging, you can set breakpoints with conditions:
+
+```
+> Set a breakpoint at line 45 in orders.go, but only break when the order total exceeds 1000
+```
+
+The AI will use conditional breakpoints to:
+- Only pause execution when specific conditions are met
+- Reduce noise from frequent breakpoint hits
+- Focus on problematic cases (e.g., `amount > 1000`, `status == "failed"`, `len(items) == 0`)
+- Use any valid Go expression as the condition
 
 #### Debugging a Single Test
 

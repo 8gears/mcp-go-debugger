@@ -9,8 +9,8 @@ import (
 	"github.com/sunfmin/mcp-go-debugger/pkg/types"
 )
 
-// SetBreakpoint sets a breakpoint at the specified file and line
-func (c *Client) SetBreakpoint(file string, line int) types.BreakpointResponse {
+// SetBreakpoint sets a breakpoint at the specified file and line with optional condition
+func (c *Client) SetBreakpoint(file string, line int, condition string) types.BreakpointResponse {
 	if c.client == nil {
 		return types.BreakpointResponse{
 			Status: "error",
@@ -21,10 +21,16 @@ func (c *Client) SetBreakpoint(file string, line int) types.BreakpointResponse {
 		}
 	}
 
-	logger.Debug("Setting breakpoint at %s:%d", file, line)
+	if condition != "" {
+		logger.Debug("Setting conditional breakpoint at %s:%d with condition: %s", file, line, condition)
+	} else {
+		logger.Debug("Setting breakpoint at %s:%d", file, line)
+	}
+
 	bp, err := c.client.CreateBreakpoint(&api.Breakpoint{
 		File: file,
 		Line: line,
+		Cond: condition,
 	})
 
 	if err != nil {
@@ -48,6 +54,7 @@ func (c *Client) SetBreakpoint(file string, line int) types.BreakpointResponse {
 		ID:              bp.ID,
 		Status:          getBreakpointStatus(bp),
 		Location:        getBreakpointLocation(bp),
+		Condition:       bp.Cond,
 		HitCount:        uint64(bp.TotalHitCount),
 	}
 
@@ -91,6 +98,7 @@ func (c *Client) ListBreakpoints() types.BreakpointListResponse {
 			ID:              bp.ID,
 			Status:          getBreakpointStatus(bp),
 			Location:        getBreakpointLocation(bp),
+			Condition:       bp.Cond,
 			HitCount:        uint64(bp.TotalHitCount),
 		})
 	}
@@ -176,6 +184,7 @@ func (c *Client) RemoveBreakpoint(id int) types.BreakpointResponse {
 		ID:              targetBp.ID,
 		Status:          "removed",
 		Location:        getBreakpointLocation(targetBp),
+		Condition:       targetBp.Cond,
 		HitCount:        uint64(targetBp.TotalHitCount),
 	}
 

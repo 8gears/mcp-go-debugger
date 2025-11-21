@@ -91,7 +91,7 @@ func (s *MCPDebugServer) addCloseTool() {
 
 func (s *MCPDebugServer) addSetBreakpointTool() {
 	breakpointTool := mcp.NewTool("set_breakpoint",
-		mcp.WithDescription("Set a breakpoint at a specific file location"),
+		mcp.WithDescription("Set a breakpoint at a specific file location with optional condition"),
 		mcp.WithString("file",
 			mcp.Required(),
 			mcp.Description("Path to the file"),
@@ -99,6 +99,9 @@ func (s *MCPDebugServer) addSetBreakpointTool() {
 		mcp.WithNumber("line",
 			mcp.Required(),
 			mcp.Description("Line number"),
+		),
+		mcp.WithString("condition",
+			mcp.Description("Optional condition expression (e.g., 'count > 5', 'username == \"admin\"')"),
 		),
 	)
 
@@ -270,7 +273,12 @@ func (s *MCPDebugServer) SetBreakpoint(ctx context.Context, request mcp.CallTool
 	file := request.Params.Arguments["file"].(string)
 	line := int(request.Params.Arguments["line"].(float64))
 
-	breakpoint := s.debugClient.SetBreakpoint(file, line)
+	var condition string
+	if condVal, ok := request.Params.Arguments["condition"]; ok && condVal != nil {
+		condition = condVal.(string)
+	}
+
+	breakpoint := s.debugClient.SetBreakpoint(file, line, condition)
 
 	return newToolResultJSON(breakpoint)
 }

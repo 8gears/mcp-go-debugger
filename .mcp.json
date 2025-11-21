@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "gopls": {
+      "command": "gopls",
+      "args": ["mcp"]
+    },
+    "delve-mcp": {
+      "command": "./bin/mcp-go-debugger",
+      "args": []
+    }
+  }
+}
+
